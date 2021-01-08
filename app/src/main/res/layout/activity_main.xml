@@ -4,42 +4,103 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
+    android:foregroundTint="#0C0C0C"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/twHW"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onClick_twHW"
-        android:text="Hello World!"
+    <ImageView
+        android:id="@+id/iv_LampOff"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitCenter"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnOFF" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/lampoff"
+        tools:ignore="ContentDescription" />
 
-    <Button
-        android:id="@+id/btnON"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="124dp"
-        android:onClick="onClick_btnON"
-        android:text="@string/btnONcaption"
+    <ImageView
+        android:id="@+id/iv_LampON"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitCenter"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/lampon"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/sw_WF"
+                android:layout_width="wrap_content"
+                android:background="@drawable/button_change_color"
+                android:layout_height="wrap_content"
+                android:text="@string/sw_wifi_name" />
+
+            <SeekBar
+                android:id="@+id/sb_Brightness"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/button_change_color"
+                android:layout_weight="1"
+                android:max="255" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_ON"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:background="@drawable/button_change_color"
+                android:onClick="onClick_btnON"
+                android:text="@string/btnONcaption" />
+
+            <Button
+                android:id="@+id/btn_OFF"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:background="@drawable/button_change_color"
+                android:onClick="onClick_btnOFF"
+                android:text="@string/btnOFFcaption" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tw_HW"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:onClick="onClick_twHW"
+        android:text="Hello World!"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btnOFF"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="52dp"
-        android:onClick="onClick_btnOFF"
-        android:text="@string/btnOFFcaption"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnON" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

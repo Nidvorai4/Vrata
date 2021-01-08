@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/vrata_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/vrata_icon_round"
         android:supportsRtl="true"
@@ -14,7 +14,8 @@
         android:networkSecurityConfig ="@xml/network_security_config"
         android:usesCleartextTraffic="true"
         >
-        <activity android:name="com.Basay.Vrata.MainActivity">
+        <activity android:name="com.Basay.Vrata.MainActivity"
+                  android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

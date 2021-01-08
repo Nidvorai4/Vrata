@@ -4,5 +4,6 @@
     <string name="HYYYYYYYT">HIYYYYYYYYYT</string>
     <string name="btnONcaption">Включить</string>
     <string name="btnOFFcaption">Выключить</string>
+    <string name="sw_wifi_name">WiFi</string>
 
 </resources>

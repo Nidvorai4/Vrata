@@ -3,19 +3,26 @@ package com.Basay.Vrata;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
-import android.content.Context;
-import android.content.res.Resources;
+import android.app.Activity;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 interface StukOtvet {  // интерфейс для передачи ответа от потока запроса обратно в Активити
@@ -61,7 +68,7 @@ class Stuk extends AsyncTask<String,Void,String>{
         try {
             //private static AsyncTask Potok;
             //String myURL = ;
-            strings[0] = doGet(myURL +strings[0] );
+            strings[0] = doGet(myURL + strings[0] );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,15 +90,57 @@ class Stuk extends AsyncTask<String,Void,String>{
 public class MainActivity extends AppCompatActivity implements StukOtvet{
     Stuk Zapros;//=new Stuk();
     String TAG ="поток";
+    String CurURL;
+    String CurCommand;
+    Integer CurDim=0;
     private TextView HW;
-    String On,Off;
+    private SwitchMaterial sw_WF;
+    private String On, Off;
+    private ImageView LampON;
+    private SeekBar sb_Br;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        HW= findViewById(R.id.twHW);
-        On=getString(R.string.LightON);
-        Off=getString(R.string.LightOFF);
+        CurURL = getString(R.string.WebURL);
+        On = getString(R.string.LightON);
+        Off = getString(R.string.LightOFF);
+        sw_WF = findViewById(R.id.sw_WF);
+        LampON=findViewById(R.id.iv_LampON);
+        LampON.setImageAlpha(0);
+        HW = findViewById(R.id.tw_HW);
+        sb_Br=findViewById(R.id.sb_Brightness);
+        sw_WF.setChecked(false);
+        sw_WF.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+             if(isChecked)CurURL=getString(R.string.LocalURL); else CurURL=getString(R.string.WebURL);
+            }
+        });
+        sb_Br.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                //HW.setText(String.valueOf(progress));
+                Posyl(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+               // HW.setText("dsadas" + seekBar.getProgress());
+            }
+        });
+
+
+
     }
 
 
@@ -105,23 +154,47 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
         super.onStop();
     }
 
-    private void  Posyl (String Command){
-        //String s=;
+
+    private void  Posyl (Integer Dim ){
+        Posyl("Bright",Dim);
+        CurDim=Dim;
+    }
+    private void  Posyl (String Command ){
+        Posyl(Command,-1);
+    }
+    private void  Posyl (String Command, Integer Dim){
+        CurCommand = Command;
+        Zapros=new Stuk(CurURL);
+        Zapros.delegate=this;
         if (Command.equals(On) || Command.equals(Off) ){
-            Zapros=new Stuk(getString(R.string.LocalURL));
-            Zapros.delegate=this;
             Zapros.execute(Command);
+        }
+        if (Dim !=-1){
+            Zapros.execute(getString(R.string.LightBright)+Dim);
         }
 
 
     }
+    @SuppressLint("NewApi") public static void setAlpha(View view, float alpha){
+        if (Build.VERSION.SDK_INT < 11) {
+            final AlphaAnimation animation = new AlphaAnimation(alpha, alpha);
+            animation.setDuration(0);
+            animation.setFillAfter(true);
+            view.startAnimation(animation);
+        }
+        else view.setAlpha(alpha);
+    }
+
+
 
     public void onClick_btnON(View view) {
         Posyl(On);
+
     }
 
     public void onClick_btnOFF(View view) {
         Posyl(Off);
+        //LampON.setImageAlpha(0);
     }
 
     public void onClick_twHW(View view) {
@@ -129,7 +202,29 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
 
     @Override
     public void KtoTam(String OtvetArduino) {
+        String Rr;//="(?<={\"text\":\").*(?=\"})";
+        Rr="hui.*";
+        Pattern RegEx= Pattern.compile("(?<=\\{\"text\":\").*(?=\"\\})");
+        Matcher m= RegEx.matcher(OtvetArduino);
+
+        //Lamp.setImageAlpha(255);
+        if (m.find( )) {
+            OtvetArduino=m.group();
+            if (CurCommand.equals(On) && OtvetArduino.equals("ON_by_WIFI"))
+                LampON.setImageAlpha(255); else
+                if (CurCommand.equals(Off) && OtvetArduino.equals("OFF"))
+                    LampON.setImageAlpha(0); else
+                    if (CurCommand.equals("Bright") && OtvetArduino.equals("ON_by_WIFI"))
+                        LampON.setImageAlpha(CurDim);
+
+
+
+
+        }
+        //OtvetArduino=
+
         HW.setText(OtvetArduino);
         Zapros.cancel(true);
     }
+
 }
