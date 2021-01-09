@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.Basay.Vrata">
+    <!-- говорим о том что хотим универсальное приложение а не только на TV -->
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <!-- говорим что нам не обязателен touchscreen -->
+    <uses-feature android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <!-- говорим о том, что локация нам не обязательна -->
+    <uses-feature
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:required="false" />
+    <!-- говорим о том, что функции телефона тоже не обязательны -->
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+    <!-- говорим о том, что микрофон нам не обязателен -->
+    <uses-feature
+        android:name="android.permission.RECORD_AUDIO"
+        android:required="false" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -18,8 +37,18 @@
                   android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- MI BOX S -->
+        <activity
+            android:name="com.Basay.Vrata.MiBoxSActivity"
+            android:theme="@style/MiBoxTheme"
+            android:banner="@mipmap/banner"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
