@@ -5,5 +5,9 @@
     <string name="btnONcaption">Включить</string>
     <string name="btnOFFcaption">Выключить</string>
     <string name="sw_wifi_name">WiFi</string>
+    <string name="btnOPENcaption">ОТКРЫТЬ ВОРОТА</string>
+    <string name="btnEXITcaption">выйти</string>
+    <string name="tv_OpenedCaption">ОТКРЫТО</string>
+
 
 </resources>

@@ -86,7 +86,8 @@
                 android:layout_weight="2"
                 android:background="@drawable/button_change_color"
                 android:onClick="onClick_btnON"
-                android:text="@string/btnONcaption" />
+                android:text="@string/btnONcaption"
+                android:textSize="30sp" />
 
             <Button
                 android:id="@+id/btn_ON2"
@@ -96,7 +97,8 @@
                 android:layout_weight="2"
                 android:background="@drawable/button_change_color"
                 android:onClick="onClick_btnEXIT"
-                android:text="@string/btnEXITcaption" />
+                android:text="@string/btnEXITcaption"
+                android:textSize="30sp" />
 
             <Button
                 android:id="@+id/btn_OFF"
@@ -106,7 +108,8 @@
                 android:layout_weight="2"
                 android:background="@drawable/button_change_color"
                 android:onClick="onClick_btnOFF"
-                android:text="@string/btnOFFcaption" />
+                android:text="@string/btnOFFcaption"
+                android:textSize="30sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -122,6 +125,7 @@
                 android:background="@drawable/button_change_color"
                 android:onClick="onClick_btnOPEN"
                 android:text="@string/btnOPENcaption"
+                android:textSize="30sp"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>

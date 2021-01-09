@@ -4,12 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -93,38 +95,63 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
     String CurURL;
     String CurCommand;
     Integer CurDim=0;
-    private TextView HW;
+    private TextView HW,tw_Opened;
     private SwitchMaterial sw_WF;
-    private String On, Off;
-    private ImageView LampON;
+    private String On, Off, Open;
+    private ImageView LampON,LampOFF;
     private SeekBar sb_Br;
+    private Button btnOFF;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         CurURL = getString(R.string.WebURL);
         On = getString(R.string.LightON);
         Off = getString(R.string.LightOFF);
-        sw_WF = findViewById(R.id.sw_WF);
-        LampON=findViewById(R.id.iv_LampON);
+        Open = getString(R.string.Open);
+
+        LampON = findViewById(R.id.iv_LampON);
         LampON.setImageAlpha(0);
+        LampON.setImageResource(R.drawable.lampon);
+        LampON.setVisibility(View.VISIBLE);
+        LampOFF = findViewById(R.id.iv_LampOff);
+        LampOFF.setVisibility(View.VISIBLE);
         HW = findViewById(R.id.tw_HW);
-        sb_Br=findViewById(R.id.sb_Brightness);
-        sw_WF.setChecked(false);
+        tw_Opened = findViewById(R.id.tw_Opened);
+        tw_Opened.setVisibility(View.INVISIBLE);
+        sb_Br = findViewById(R.id.sb_Brightness);
+        btnOFF = findViewById(R.id.btn_OFF);
+        btnOFF.setLongClickable(true);
+        sw_WF = findViewById(R.id.sw_WF);
         sw_WF.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-             if(isChecked)CurURL=getString(R.string.LocalURL); else CurURL=getString(R.string.WebURL);
+                if (isChecked)
+                    CurURL = getString(R.string.LocalURL);
+                else
+                    CurURL = getString(R.string.WebURL);
             }
         });
+
+
+        btnOFF.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                findViewById(R.id.btn_OPEN).setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
+
+        //sw_WF.setChecked(false);
         sb_Br.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 //HW.setText(String.valueOf(progress));
-                Posyl(progress);
+
             }
 
             @Override
@@ -134,15 +161,35 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
-               // HW.setText("dsadas" + seekBar.getProgress());
+                Posyl(seekBar.getProgress());
+                // HW.setText("dsadas" + seekBar.getProgress());
             }
         });
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            sw_WF.setChecked(true);//CurURL = getString(R.string.LocalURL);
+            //HW.setText("LAND");
+        } else {
+            sw_WF.setChecked(false);//CurURL = getString(R.string.WebURL);
+            //HW.setText("PORT");
+        }
+        //HW.setText(HW.getText() + " " + sw_WF.isChecked());
+        //sw_WF.refreshDrawableState();
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
+    }
 
     @Override
     protected void onDestroy() {
@@ -166,14 +213,10 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
         CurCommand = Command;
         Zapros=new Stuk(CurURL);
         Zapros.delegate=this;
-        if (Command.equals(On) || Command.equals(Off) ){
-            Zapros.execute(Command);
-        }
-        if (Dim !=-1){
+        if (Dim !=-1)
             Zapros.execute(getString(R.string.LightBright)+Dim);
-        }
-
-
+         else
+            Zapros.execute(Command);
     }
     @SuppressLint("NewApi") public static void setAlpha(View view, float alpha){
         if (Build.VERSION.SDK_INT < 11) {
@@ -206,7 +249,10 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
         Rr="hui.*";
         Pattern RegEx= Pattern.compile("(?<=\\{\"text\":\").*(?=\"\\})");
         Matcher m= RegEx.matcher(OtvetArduino);
-
+        LampON.setImageResource(R.drawable.lampon);
+        LampON.setVisibility(View.VISIBLE);
+        LampOFF.setVisibility(View.VISIBLE);
+        tw_Opened.setVisibility(View.INVISIBLE);
         //Lamp.setImageAlpha(255);
         if (m.find( )) {
             OtvetArduino=m.group();
@@ -215,11 +261,20 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
                 if (CurCommand.equals(Off) && OtvetArduino.equals("OFF"))
                     LampON.setImageAlpha(0); else
                     if (CurCommand.equals("Bright") && OtvetArduino.equals("ON_by_WIFI"))
-                        LampON.setImageAlpha(CurDim);
-
-
-
-
+                        LampON.setImageAlpha(CurDim); else
+                        if (CurCommand.equals(Open) && OtvetArduino.equals("OPN_by_WIFI")){
+                            tw_Opened.setVisibility(View.VISIBLE);
+                            LampON.setVisibility(View.INVISIBLE);
+                            LampOFF.setVisibility(View.INVISIBLE);
+                            findViewById(R.id.btn_OPEN).setVisibility(View.GONE);
+                            // анимация открытия
+                        }
+                        else
+                        {
+                            //LampON.setImageDrawable(getResources().getDrawable(R.drawable.lamperror));
+                            LampON.setImageResource(R.drawable.lamperror);
+                            LampON.setImageAlpha(255);
+                        }
         }
         //OtvetArduino=
 
@@ -227,4 +282,12 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
         Zapros.cancel(true);
     }
 
+    public void onClick_btnOPEN(View view) {
+        Posyl(Open);
+    }
+
+    public void onClick_btnEXIT(View view) {
+        //sw_WF.setChecked(!sw_WF.isChecked());
+        finish();
+    }
 }
