@@ -1,14 +1,15 @@
 package com.Basay.Vrata;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -22,6 +23,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.regex.Matcher;
@@ -34,7 +36,7 @@ interface StukOtvet {  // интерфейс для передачи ответ�
 
 class Stuk extends AsyncTask<String,Void,String>{
     public StukOtvet delegate = null;
-    @SuppressLint("StaticFieldLeak")
+    //@SuppressLint("StaticFieldLeak")
     private String myURL;
     Stuk(String url_){
         myURL=url_;
@@ -92,7 +94,6 @@ class Stuk extends AsyncTask<String,Void,String>{
 //===========================================================================================         ACTIVITY =============================================
 public class MainActivity extends AppCompatActivity implements StukOtvet{
     Stuk Zapros;//=new Stuk();
-    String TAG ="поток";
     String CurURL;
     String CurCommand;
     Integer CurDim=0;
@@ -100,10 +101,36 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
     private SwitchMaterial sw_WF;
     private String On, Off, Open;
     private ImageView LampON,LampOFF;
-    private SeekBar sb_Br;
-    private Button btnOFF;
+    private static AntiUte4nyiHandler AntiDrebezgH;
+    private boolean AntiDrZanyato;
+    private Integer AntiDrLastDim=0;
 
+    //==========================================================================================
+    static class AntiUte4nyiHandler extends Handler {
+        /*слабая ссылка нужна, чтоб сделать хэндлер сатическим(чтоб не утекала память), но чтоб
+        * он всё же имел доступ к активити. Если повернуть экран - активити удалится, и хэндлер
+        * не будет держать её за яйца, потому что сслыка слабая. Всё похацкается как надо*/
+        WeakReference<MainActivity> wrActivity;
 
+        public AntiUte4nyiHandler(MainActivity activity) {
+            wrActivity = new WeakReference<MainActivity>(activity);
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            MainActivity activity = wrActivity.get();
+            /* яркость устанавливается либо посланная пол секунды назад, либо последняя, которая
+            * хотела установиться, когда уже было занято*/
+            if (activity != null){
+                if(activity.AntiDrLastDim==-1)activity.AntiDrLastDim=msg.what;
+                activity.Posyl(activity.AntiDrLastDim);
+                activity.AntiDrZanyato=false;
+            }
+            //activity.someMethod();
+        }
+    }
+    //==========================================================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,8 +151,8 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
         HW = findViewById(R.id.tw_HW);
         tw_Opened = findViewById(R.id.tw_Opened);
         tw_Opened.setVisibility(View.INVISIBLE);
-        sb_Br = findViewById(R.id.sb_Brightness);
-        btnOFF = findViewById(R.id.btn_OFF);
+        SeekBar sb_Br = findViewById(R.id.sb_Brightness);
+        Button btnOFF = findViewById(R.id.btn_OFF);
         btnOFF.setLongClickable(true);
         sw_WF = findViewById(R.id.sw_WF);
         sw_WF.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -148,21 +175,37 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
         });
 
         //sw_WF.setChecked(false);
+
+
+        AntiDrebezgH = new AntiUte4nyiHandler(this);
+        AntiDrZanyato = false;
         sb_Br.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //HW.setText(String.valueOf(progress));
-
+                /* отправка хэндлу сообщения о текущей яркости, которое он выполнит позже.
+                * Если занято - сохранение самой последней яркости. Она применится, когда хэндл отдуплится */
+                if (!AntiDrZanyato){
+                    AntiDrZanyato=true;
+                    AntiDrLastDim=-1;
+                    AntiDrebezgH.sendEmptyMessageDelayed(progress,500);
+                }
+                else
+                {
+                    AntiDrLastDim = progress;
+                }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
 
+
+                //HW.setText("StartTracking");
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                Posyl(seekBar.getProgress());
+               // Posyl(seekBar.getProgress());
+               // ((TextView)findViewById(R.id.tw_HW3)).setText("StopTracking");
                 // HW.setText("dsadas" + seekBar.getProgress());
             }
         });
@@ -195,6 +238,8 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(AntiDrebezgH!=null) // очистка хэндлера от сообщений, чтоб система могла его спокойно похацкать при повороте
+            AntiDrebezgH.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -247,7 +292,6 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
     @Override
     public void KtoTam(String OtvetArduino) {
         String Rr;//="(?<={\"text\":\").*(?=\"})";
-        Rr="hui.*";
         Pattern RegEx= Pattern.compile("(?<=\\{\"text\":\").*(?=\"\\})");
         Matcher m= RegEx.matcher(OtvetArduino);
         LampON.setImageResource(R.drawable.lampon);
@@ -288,7 +332,6 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
     }
 
     public void onClick_btnEXIT(View view) {
-        //sw_WF.setChecked(!sw_WF.isChecked());
         finish();
     }
 }
