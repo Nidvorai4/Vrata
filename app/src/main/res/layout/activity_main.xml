@@ -8,6 +8,7 @@
     android:foregroundTint="#0C0C0C"
     tools:context=".MainActivity">
 
+
     <ImageView
         android:id="@+id/iv_LampOff"
         android:layout_width="0dp"
@@ -20,7 +21,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/lampoff"
         tools:ignore="ContentDescription" />
-
     <ImageView
         android:id="@+id/iv_LampON"
         android:layout_width="0dp"
@@ -34,6 +34,25 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/lampon"
         tools:ignore="ContentDescription" />
+
+    <ProgressBar
+        android:id="@+id/pb_Sending"
+        style="@android:style/Widget.Material.ProgressBar.Small"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foregroundGravity="center_vertical|center_horizontal"
+        android:foregroundTint="#A12C2C"
+        android:indeterminateTint="#FF9800"
+        android:progressTint="#EC4E4E"
+        android:rotation="0"
+        android:rotationX="18"
+        android:rotationY="0"
+        android:scrollbarSize="1dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_LampOff"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -167,6 +186,7 @@
             app:autoSizeMinTextSize="12sp"
             app:autoSizeStepGranularity="2sp"
             app:autoSizeTextType="uniform" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,4 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="Focused">#2E2C23</color>
+    <color name="Pressed">#686866</color>
 </resources>
