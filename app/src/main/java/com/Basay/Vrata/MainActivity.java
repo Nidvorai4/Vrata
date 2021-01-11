@@ -4,11 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
@@ -75,6 +78,7 @@ class Stuk extends AsyncTask<String,Void,String>{
             //String myURL = ;
             strings[0] = doGet(myURL + strings[0] );
         } catch (Exception e) {
+            strings[0]="Ошибка запроса. Что-то с соединением";
             e.printStackTrace();
         }
         return strings[0];
@@ -102,8 +106,17 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
     private String On, Off, Open;
     private ImageView LampON,LampOFF;
     private static AntiUte4nyiHandler AntiDrebezgH;
-    private boolean AntiDrZanyato;
-    private Integer AntiDrLastDim=0;
+    private volatile boolean AntiDrZanyato;
+    private volatile Integer AntiDrLastDim=0;
+
+
+
+
+
+
+
+
+
 
     //==========================================================================================
     static class AntiUte4nyiHandler extends Handler {
@@ -135,7 +148,10 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_main);
         CurURL = getString(R.string.WebURL);
         On = getString(R.string.LightON);
@@ -183,14 +199,12 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 /* отправка хэндлу сообщения о текущей яркости, которое он выполнит позже.
-                * Если занято - сохранение самой последней яркости. Она применится, когда хэндл отдуплится */
-                if (!AntiDrZanyato){
-                    AntiDrZanyato=true;
-                    AntiDrLastDim=-1;
-                    AntiDrebezgH.sendEmptyMessageDelayed(progress,500);
-                }
-                else
-                {
+                 * Если занято - сохранение самой последней яркости. Она применится, когда хэндл отдуплится */
+                if (!AntiDrZanyato) {
+                    AntiDrZanyato = true;
+                    AntiDrLastDim = -1;
+                    AntiDrebezgH.sendEmptyMessageDelayed(progress, 500);
+                } else {
                     AntiDrLastDim = progress;
                 }
             }
@@ -204,11 +218,12 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-               // Posyl(seekBar.getProgress());
-               // ((TextView)findViewById(R.id.tw_HW3)).setText("StopTracking");
+                // Posyl(seekBar.getProgress());
+                // ((TextView)findViewById(R.id.tw_HW3)).setText("StopTracking");
                 // HW.setText("dsadas" + seekBar.getProgress());
             }
         });
+
 
 
     }
@@ -256,6 +271,7 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
         Posyl(Command,-1);
     }
     private void  Posyl (String Command, Integer Dim){
+        findViewById(R.id.pb_Sending).setVisibility(View.VISIBLE);
         CurCommand = Command;
         Zapros=new Stuk(CurURL);
         Zapros.delegate=this;
@@ -291,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
 
     @Override
     public void KtoTam(String OtvetArduino) {
+        findViewById(R.id.pb_Sending).setVisibility(View.INVISIBLE);
         String Rr;//="(?<={\"text\":\").*(?=\"})";
         Pattern RegEx= Pattern.compile("(?<=\\{\"text\":\").*(?=\"\\})");
         Matcher m= RegEx.matcher(OtvetArduino);
@@ -312,15 +329,24 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
                             LampON.setVisibility(View.INVISIBLE);
                             LampOFF.setVisibility(View.INVISIBLE);
                             findViewById(R.id.btn_OPEN).setVisibility(View.GONE);
+                            final Handler handler = new Handler(Looper.getMainLooper());
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    finish();
+                                }
+                            }, 2000);
+
                             // анимация открытия
                         }
-                        else
-                        {
-                            //LampON.setImageDrawable(getResources().getDrawable(R.drawable.lamperror));
-                            LampON.setImageResource(R.drawable.lamperror);
-                            LampON.setImageAlpha(255);
-                        }
         }
+        else
+        {
+            //LampON.setImageDrawable(getResources().getDrawable(R.drawable.lamperror));
+            LampON.setImageResource(R.drawable.lamperror);
+            LampON.setImageAlpha(255);
+        }
+
         //OtvetArduino=
 
         HW.setText(OtvetArduino);
@@ -332,6 +358,8 @@ public class MainActivity extends AppCompatActivity implements StukOtvet{
     }
 
     public void onClick_btnEXIT(View view) {
+
+
         finish();
     }
 }

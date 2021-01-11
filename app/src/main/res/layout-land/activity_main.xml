@@ -35,6 +35,24 @@
         app:srcCompat="@drawable/lampon"
         tools:ignore="ContentDescription" />
 
+    <ProgressBar
+        android:id="@+id/pb_Sending"
+        style="@android:style/Widget.Material.ProgressBar.Small"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foregroundGravity="center_vertical|center_horizontal"
+        android:foregroundTint="#A12C2C"
+        android:indeterminateTint="#FF9800"
+        android:progressTint="#EC4E4E"
+        android:rotation="0"
+        android:rotationX="72"
+        android:rotationY="0"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_LampOff"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
